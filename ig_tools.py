@@ -7,8 +7,8 @@ OneData ©2022
 
 from yaml import safe_load
 from requests import get
-from datetime import date, timedelta
-from pandas import json_normalize, DataFrame, merge
+# from datetime import date, timedelta
+# from pandas import json_normalize, DataFrame, merge
 
 # METRICS = ["reach", 'impressions', 'profile_views', 'follower_count',
 #            'phone_call_clicks', 'text_message_clicks', 'website_clicks',
@@ -54,37 +54,6 @@ def get_account_id(cuenta):
         print(e)
 
 
-def prep_profile_insights_query(account_id: str, metrics, start_date, end_date):
-    token = get_creds()['token']
-    if not end_date:
-        end_date = date.today() - timedelta(1)
-        end_date = end_date.strftime('%Y-%m-%d')
-    if not start_date:
-        start_date = date.fromisoformat(end_date) - timedelta(15)
-        start_date = start_date.strftime('%Y-%m-%d')
-    url = (
-        f"https://graph.facebook.com/v13.0/{account_id}/insights?"
-        "metric="
-        f"{','.join(metrics)}"
-        "&period=day"
-        f"&since={start_date}+&until={end_date}"
-        f"&access_token={token}"
-    )
-    return url
-
-
-def prep_profile_posts_query(account_id: str, fields, numero_posts: int = 30):
-    token = get_creds()['token']
-    url = (
-        f"https://graph.facebook.com/v13.0/{account_id}"
-        "?fields=media.limit"
-        f"({numero_posts})"
-        f"{fields}"
-        f"&access_token={token}"
-    )
-    return url
-
-
 def get_request(url):
     result = get(url)
     if result.status_code != 200:
@@ -92,43 +61,13 @@ def get_request(url):
         print(result.text)
     else:
         result = result.json()
-        if 'media' in result.keys():
-            data = result['media']['data']
-            paging_next = result['media']['paging']['next']
-        else:
-            data = result['data']
-            paging_next = result['paging']['next']
+        # if 'media' in result.keys():
+        #     data = result['media']['data']
+        #     paging_next = result['media']['paging']['next']
+        # else:
+        #     data = result['data']
+        #     paging_next = result['paging']['next']
+        # return data, paging_next
+        data = result['data']
+        paging_next = result['paging']['next']
         return data, paging_next
-
-
-def parse_profile_insights(data):
-    df: DataFrame = (
-        json_normalize(
-            data,
-            record_path='values',
-            meta=['name'],
-            errors='ignore'
-            )
-        .pivot(index='end_time', columns='name', values='value')
-    )
-    return df
-
-
-def parse_posts_insights(data):
-    posts = json_normalize(
-            data,
-            max_level=0
-            )
-    posts.drop('insights', inplace=True, axis=1)
-    posts.rename(columns = {'id':'post_id'}, inplace=True)
-    metrics = json_normalize(
-            data=data,
-            record_path=['insights', ['data']],
-            meta=['id'],
-            meta_prefix='post_'
-    )
-    metrics['values'] = metrics['values'].apply(lambda x: x[0]['value'])
-    metrics = metrics.pivot(columns='name', values='values', index='post_id')
-    metrics.reset_index(inplace=True)
-    df = merge(posts, metrics, on='post_id')
-    return df
