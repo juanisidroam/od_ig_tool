@@ -7,13 +7,14 @@ OneData ©2022
 
 from ig_owned_daily_insights import get_daily_profile_metrics
 from ig_owned_posts_insights import get_posts_metrics
+from ig_owned_online_followers import get_online_followers
 
 cuenta = "pizzahutrd"
 start_date = "2022-05-5"
 end_date = "2022-05-20"
 
 df = get_daily_profile_metrics(cuenta, start_date=start_date, end_date=end_date)
-posts = get_posts_metrics(cuenta=cuenta, nposts=10)
+posts = get_posts_metrics(cuenta=cuenta, nposts=30)
 #
 # writer = pd.ExcelWriter(f'{ig_{cuenta}_page_insights.xlsx', engine='xlsxwriter')
 #
