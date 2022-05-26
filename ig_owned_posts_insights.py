@@ -6,6 +6,7 @@ OneData ©2022
 """
 from pandas import concat, json_normalize, merge
 from ig_tools import get_account_id, get_creds, get_request
+from general_utilities import convert_timezone
 
 fields = (
     "username,timestamp,permalink"
@@ -44,14 +45,15 @@ def parse_posts_insights(data):
     metrics = metrics.pivot(columns='name', values='values', index='post_id')
     metrics.reset_index(inplace=True)
     df = merge(posts, metrics, on='post_id')
+    df.timestamp = df.timestamp.apply(convert_timezone)
     return df
 
 
 def get_posts_metrics(
         cuenta: str, nposts: int = 30, nperiods: int = 3):
-    # cuenta = 'pizzahutrd'
-    # nposts = 10
-    # nperiods = 3
+    cuenta = 'pizzahutrd'
+    nposts = 10
+    nperiods = 3
     results = []
     account_id = get_account_id(cuenta)
     url = prep_profile_posts_query(account_id, nposts)

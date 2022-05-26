@@ -57,7 +57,10 @@ def get_request(url):
         result = result.json()
         data = result['data']
         try:
-            paging_next = result['paging']['next']
+            if 'since' in url:
+                paging_next = result['paging']['previous']
+            else:
+                paging_next = result['paging']['next']
         except KeyError:
             paging_next = None
         return data, paging_next

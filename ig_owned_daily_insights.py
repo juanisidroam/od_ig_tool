@@ -29,18 +29,12 @@ def deliver_metrics(start_date, end_date, periods):
 
 def prep_profile_insights_query(account_id: str, metrics, start_date, end_date):
     token = get_creds()['token']
-    if not end_date:
-        end_date = date.today() - timedelta(1)
-        end_date = end_date.strftime('%Y-%m-%d')
-    if not start_date:
-        start_date = date.fromisoformat(end_date) - timedelta(15)
-        start_date = start_date.strftime('%Y-%m-%d')
     url = (
         f"https://graph.facebook.com/v13.0/{account_id}/insights?"
         "metric="
         f"{','.join(metrics)}"
         "&period=day"
-        f"&since={start_date}+&until={end_date}"
+        f"&since={start_date}&until={end_date}"
         f"&access_token={token}"
     )
     return url
@@ -62,6 +56,14 @@ def parse_profile_insights(data):
 def get_daily_profile_metrics(
         cuenta: str, periods: int = 3,
         start_date: str = None, end_date: str = None):
+    cuenta = 'pizzahutrd'
+    periods = 3
+    if not end_date:
+        end_date = date.today() - timedelta(1)
+        end_date = end_date.strftime('%Y-%m-%d')
+    if not start_date:
+        start_date = date.fromisoformat(end_date) - timedelta(15)
+        start_date = start_date.strftime('%Y-%m-%d')
     results = []
     account_id = get_account_id(cuenta)
     metrics = deliver_metrics(start_date, end_date, periods)
@@ -71,5 +73,7 @@ def get_daily_profile_metrics(
         data = parse_profile_insights(data)
         results.append(data)
         periods -= 1
+        if not url:
+            break
     final_df = concat(results, axis=0, ignore_index=True)
     return final_df
