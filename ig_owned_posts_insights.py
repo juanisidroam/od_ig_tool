@@ -5,8 +5,9 @@ Created on 5/21/2022 at 12:58 AM
 OneData ©2022
 """
 from pandas import concat, json_normalize, merge
-from ig_tools import get_account_id, get_creds, get_request
+
 from general_utilities import convert_timezone
+from ig_tools import get_account_id, get_creds, get_request
 
 fields = (
     "username,timestamp,permalink"
@@ -51,9 +52,9 @@ def parse_posts_insights(data):
 
 def get_posts_metrics(
         cuenta: str, nposts: int = 30, nperiods: int = 3):
-    cuenta = 'pizzahutrd'
-    nposts = 10
-    nperiods = 3
+    # cuenta = 'pizzahutrd'
+    # nposts = 10
+    # nperiods = 3
     results = []
     account_id = get_account_id(cuenta)
     url = prep_profile_posts_query(account_id, nposts)

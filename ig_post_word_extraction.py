@@ -12,7 +12,6 @@ nlp = spacy.load("es_dep_news_trf")
 # spacy.prefer_gpu()
 
 
-#%%
 def extrae_palabras_claves(df):
     lista_palabras = []
     for idx, texto in df.values:
@@ -44,8 +43,6 @@ def create_emoji_chart(df):
         bla = [(idx, a) for a in df.loc[filtro, 'emoji'].values[0]]
         df_list.extend(bla)
     return df_list
-
-#%%
 
 
 def main(df):
