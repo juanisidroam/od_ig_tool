@@ -4,62 +4,51 @@ Created on 5/21/2022 at 5:36 PM
 @author: juanisidro
 OneData ©2022
 """
+from pandas import concat
+from general_utilities import convert_timezone
+from ig_tools import get_account_id, get_creds, get_request
 
 
+fields = (
+    "id,comments{"
+    "id,timestamp,username,text,like_count}"
+    )
+account_id = get_account_id('pizzahutrd')
+def prep_comments_query(account_id: str, numero_posts: int = 30):
+    token = get_creds()['token']
+    url = (
+        f"https://graph.facebook.com/v13.0/{account_id}"
+        "/media?"
+        f"fields={fields}"
+        f"&limit={numero_posts}"
+        f"&access_token={token}"
+    )
+    return url
 
-# extract all words from comments
-postWords = []
-wordLikes = []
-wordCom = []
-wordSave = []
-wordEngage = []
-postID = []
 
-for pos, val in enumerate(postInsights['caption']):
-    sepaTemp = val.split(" ")
-    for b in range(len(sepaTemp)):
-        em_split_emoji = emoji.get_emoji_regexp().split(sepaTemp[b])
-        for c in em_split_emoji:
-            postWords.append(c)
-            wordLikes.append(postInsights['like_count'][pos])
-            wordCom.append(postInsights['comments_count'][pos])
-            wordSave.append(postInsights['saved'][pos])
-            wordEngage.append(postInsights['engagement'][pos])
-            postID.append(postInsights['id'][pos])
-
-postWordList = pd.DataFrame([postWords, wordLikes, wordCom, wordSave, wordEngage],
-                            ["palabras", "likes", "comments", "saves", "engagements"])
-postWordList = pd.DataFrame.transpose(postWordList)
-
-# just emoji from comments
-postEmoji = []
-emojiLikes = []
-emojiCom = []
-emojiSave = []
-emojiEngage = []
-postID = []
-
-for pos, val in enumerate(postInsights['caption']):
-    try:
-        temp = split_count(val)
-        for b in temp:
-            postEmoji.append(b)
-            emojiLikes.append(postInsights['like_count'][pos])
-            emojiCom.append(postInsights['comments_count'][pos])
-            emojiSave.append(postInsights['saved'][pos])
-            emojiEngage.append(postInsights['engagement'][pos])
-            postID.append(postInsights['id'][pos])
-    except:
-        pass
-
-postEmojiList = pd.DataFrame([postEmoji, emojiLikes, emojiCom, emojiSave, emojiEngage],
-                             ["emoji", "likes", "comments", "saves", "engagements"])
-postEmojiList = pd.DataFrame.transpose(postEmojiList)
-
+def get_posts_comments(
+        cuenta: str, nposts: int = 30, nperiods: int = 3):
+    # cuenta = 'pizzahutrd'
+    # nposts = 10
+    # nperiods = 3
+    results = []
+    account_id = get_account_id(cuenta)
+    url = prep_comments_query(account_id, nposts)
+    while nperiods > -1:
+        data, url = get_request(url)
+        data = parse_posts_insights(data)
+        results.append(data)
+        nperiods -= 1
+    final_df = concat(results, axis=0, ignore_index=True)
+    return final_df
 # Gather Post Comments
 table = []
-url = "https://graph.facebook.com/v5.0/" + IG_ID + "?fields=media.limit(100){username,timestamp,permalink,id,comments}&access_token=" + TOKEN
+url = "https://graph.facebook.com/v13.0/" + account_id + "?fields=media.limit(100){username,timestamp,permalink,id,comments}&access_token=" + token
+17841400533223349/media?pretty=0&fields=username%2Ctimestamp%2Cpermalink%2Cid%2Ccomments%7Bid%2Ctimestamp%2Ctext%2Creplies%2Clike_count%2Cusername%7D&limit=1&after=QVFIUkY5RlFVVU5yUmFiaVJpR2FZAVW1hTlBhU2xYTDJ1TFpVOEdVbm8zOF9XN2ItLW42ektlQnExd2ZAKMzBJVmJ1a2lIWWxOSXgyUnllaU41amI4ZAmVXVDdn
+
+17921644535278086/comments?
 info = rs.get(url)
+
 table.append(json.loads(info.text))
 
 fields = []
