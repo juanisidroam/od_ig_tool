@@ -35,17 +35,11 @@ def get_emoji(text):
     return [e['emoji'] for e in lista_emoji]
 
 
-def create_emoji_chart(df):
-    df['emoji'] = df['caption'].apply(get_emoji)
+def create_emoji_chart(df, text_col='caption'):
+    df['emoji'] = df[text_col].apply(get_emoji)
     df_list = []
     for idx in df.post_id:
         filtro = df.post_id == idx
         bla = [(idx, a) for a in df.loc[filtro, 'emoji'].values[0]]
         df_list.extend(bla)
     return df_list
-
-
-def main(df):
-    post_word_chart = extrae_palabras_claves(df[['post_id', 'caption']])
-    post_emoji_chart = pd.DataFrame(create_emoji_chart(df), columns=['post_id', 'emoji'])
-    return post_word_chart, post_emoji_chart

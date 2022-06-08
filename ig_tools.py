@@ -42,7 +42,7 @@ def get_account_id(cuenta):
             f".username({cuenta})"
             "{id}"
             f"&access_token={token}"
-        )
+            )
         return ig_id.json()["business_discovery"]["id"]
     except Exception as e:
         print(e)
@@ -63,4 +63,29 @@ def get_request(url):
                 paging_next = result['paging']['next']
         except KeyError:
             paging_next = None
+        return data, paging_next
+
+
+def get_comments(url):
+    result = get(url)
+    if result.status_code != 200:
+        print('Request fallido')
+        print(result.text)
+    else:
+        result = result.json()
+        try:
+            data = result['comments']['data']
+        except KeyError:
+            data = result['data']
+        try:
+            paging_next = result['comments']['paging']
+            try:
+                paging_next = paging_next['next']
+            except KeyError:
+                paging_next = None
+        except KeyError:
+            try:
+                paging_next = result['paging']['next']
+            except KeyError:
+                paging_next = None
         return data, paging_next

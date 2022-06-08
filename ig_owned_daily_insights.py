@@ -54,7 +54,7 @@ def parse_profile_insights(data):
 
 
 def get_daily_profile_metrics(
-        cuenta: str, periods: int = 3,
+        cuenta: str, nperiods: int = 3,
         start_date: str = None, end_date: str = None):
     cuenta = 'pizzahutrd'
     periods = 3

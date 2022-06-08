@@ -31,7 +31,10 @@ def prep_comments_query(media_id: str):
 
 def parse_comments(data):
     comments = json_normalize(data)
-    comments.drop('replies.data', inplace=True, axis=1)
+    try:
+        comments.drop('replies.data', inplace=True, axis=1)
+    except KeyError:
+        pass
     comments.timestamp = comments.timestamp.apply(convert_timezone)
     # for elem in data:
     #     if 'replies' not in elem.keys():
