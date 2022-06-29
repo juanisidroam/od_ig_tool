@@ -26,7 +26,7 @@ def prep_profile_posts_query(account_id: str, numero_posts: int = 30):
         f"fields={fields}"
         f"&limit={numero_posts}"
         f"&access_token={token}"
-    )
+        )
     return url
 
 
@@ -35,14 +35,14 @@ def parse_posts_insights(data):
             data,
             max_level=0
             )
-    posts.drop('insights', inplace=True, axis=1)
+    posts.drop(['insights', 'comments'], inplace=True, axis=1)
     posts.rename(columns={'id': 'post_id'}, inplace=True)
     metrics = json_normalize(
             data=data,
             record_path=['insights', ['data']],
             meta=['id'],
             meta_prefix='post_'
-    )
+            )
     metrics['values'] = metrics['values'].apply(lambda x: x[0]['value'])
     metrics = metrics.pivot(columns='name', values='values', index='post_id')
     metrics.reset_index(inplace=True)
@@ -54,7 +54,7 @@ def parse_posts_insights(data):
             record_path=['comments', ['data']],
             meta=['id'],
             meta_prefix='post_'
-    )
+        )
     df = merge(posts, metrics, on='post_id')
     df.timestamp = df.timestamp.apply(convert_timezone)
     comments.timestamp = comments.timestamp.apply(convert_timezone)

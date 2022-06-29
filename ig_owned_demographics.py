@@ -47,7 +47,7 @@ def parse_records(data):
     nombre = data['name']
     request_date = parsed_data.iloc[0][0]
     parsed_data = parsed_data.iloc[1:]
-    parsed_data['request_date'] = convert_timezone(request_date)
+    parsed_data['request_date'] = convert_timezone(request_date).date()
     parsed_data.index = parsed_data.index.str.replace('value.', '')
     parsed_data.reset_index(inplace=True)
     parsed_data.rename({'index': nombre, 0: 'followers'}, axis=1, inplace=True)
@@ -64,7 +64,3 @@ def get_demographic_metrics(account) -> tuple:
     provincias = arrange_provinces(provincias)
     edad_genero = arrange_gender(edad_genero)
     return provincias, edad_genero
-
-
-cuenta = 'pizzahutrd'
-get_demographic_metrics(cuenta)

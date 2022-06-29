@@ -40,7 +40,7 @@ def prep_online_followers_query(account_id: str):
         "&period=lifetime"
         f"&since={start_date}+&until={end_date}"
         f"&access_token={token}"
-    )
+        )
     return url
 
 

@@ -15,7 +15,6 @@ nlp = spacy.load("es_dep_news_trf")
 def extrae_palabras_claves(df):
     lista_palabras = []
     for idx, texto in df.values:
-        print(idx, texto)
         doc = nlp(texto.lower())
         pos_list = 'ADV|ADJ|NOUN|VERB|AUX|PRON|PROPN'
         lista = [
@@ -42,4 +41,5 @@ def create_emoji_chart(df, text_col='caption'):
         filtro = df.post_id == idx
         bla = [(idx, a) for a in df.loc[filtro, 'emoji'].values[0]]
         df_list.extend(bla)
+    df.drop('emoji', axis=1, inplace=True)
     return df_list

@@ -53,12 +53,10 @@ def get_posts_comments(media_id: str):
     # media_id = "17926929005103657"
     results = []
     url = prep_comments_query(media_id)
-    print(media_id)
     while url is not None:
         data, url = get_comments(url)
         data = parse_comments(data)
         results.append(data)
-        print(data.shape)
     final_df = concat(results, axis=0, ignore_index=True)
     final_df['post_id'] = media_id
     return final_df
